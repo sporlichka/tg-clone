@@ -1,0 +1,59 @@
+/* Telegram Blue Theme */
+:root {
+  --primary-blue: #0088cc;
+  --light-blue: #54a9eb;
+  --dark-blue: #006bb3;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --text-primary: #000000;
+  --text-secondary: #707579;
+  --border-color: #e4e4e7;
+  --message-out: #effdde;
+  --message-in: #ffffff;
+}
+
+/* Theme Classes */
+.theme-sidebar {
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  width: 20rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-chat-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.theme-message-out {
+  background-color: var(--message-out);
+  color: var(--text-primary);
+  border-radius: 1rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.theme-message-in {
+  background-color: var(--message-in);
+  color: var(--text-primary);
+  border-radius: 1rem;
+  border-bottom-left-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.theme-input-area {
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+}
+
+.theme-online-indicator {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #22c55e;
+  border-radius: 9999px;
+  border: 2px solid var(--bg-primary);
+}
