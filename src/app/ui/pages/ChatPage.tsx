@@ -5,21 +5,29 @@ import { DEFAULT_CHATS } from "../../types/chat";
 import { ChatInterface } from "../components/ChatInterface";
 import { getMessages, saveMessage } from "../../services/storage";
 import { sendMessageToGroq } from "../../services/groq";
+import {
+  useMessagesQuery,
+  useSendMessageMutation,
+  useSendAiMessageMutation,
+} from "../hooks/useMessagesQuery";
+import { useChatsQuery } from "../hooks/useChatsQuery";
 
 export const ChatPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { data: chats = [] } = useChatsQuery();
+  const chat = chats.find((c) => c.id === chatId);
+  const { data: messages = [], refetch } = useMessagesQuery(chatId);
+  const sendMessageMutation = useSendMessageMutation(chatId, refetch);
+  const sendAiMessageMutation = useSendAiMessageMutation(chatId, refetch);
   const [isTyping, setIsTyping] = useState(false);
-
-  const chat = DEFAULT_CHATS.find((c) => c.id === chatId);
 
   useEffect(() => {
     if (chatId) {
       // Load messages from localStorage when chat changes
       const storedMessages = getMessages(chatId);
-      setMessages(storedMessages);
+      refetch();
     }
-  }, [chatId]);
+  }, [chatId, refetch]);
 
   const handleSendMessage = async (content: string) => {
     if (!chatId) return;
@@ -34,25 +42,12 @@ export const ChatPage = () => {
 
     // Save and update messages
     saveMessage(chatId, newMessage);
-    setMessages((prev) => [...prev, newMessage]);
+    refetch();
 
     if (chat?.type === "ai") {
       setIsTyping(true);
       try {
-        // Get AI response from Groq
-        const aiResponse = await sendMessageToGroq(content);
-
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          chatId,
-          content: aiResponse,
-          timestamp: new Date().toISOString(),
-          isOutgoing: false,
-        };
-
-        // Save and update AI response
-        saveMessage(chatId, aiMessage);
-        setMessages((prev) => [...prev, aiMessage]);
+        await sendAiMessageMutation.mutateAsync(content);
       } catch (error) {
         console.error("Error getting AI response:", error);
         // Handle error - maybe show an error message to the user
@@ -64,10 +59,12 @@ export const ChatPage = () => {
           isOutgoing: false,
         };
         saveMessage(chatId, errorMessage);
-        setMessages((prev) => [...prev, errorMessage]);
+        refetch();
       } finally {
         setIsTyping(false);
       }
+    } else {
+      await sendMessageMutation.mutateAsync(content);
     }
   };
 

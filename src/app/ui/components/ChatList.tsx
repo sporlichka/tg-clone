@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { NavLink } from "react-router";
-import type { Chat } from "../../types/chat";
+// import type { Chat } from "../../types/chat";
+import { useChatsQuery } from "../hooks/useChatsQuery";
 // import { themeClasses } from "../theme";
 
-interface ChatListProps {
-  chats: Chat[];
-}
-
-export const ChatList = ({ chats }: ChatListProps) => {
+export const ChatList = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Используем react-query для получения списка чатов, чтобы обеспечить кэширование и автоматическое обновление
+  const { data: chats = [] } = useChatsQuery();
 
   const filteredChats = chats.filter((chat) =>
     chat.name.toLowerCase().includes(searchQuery.toLowerCase()),
